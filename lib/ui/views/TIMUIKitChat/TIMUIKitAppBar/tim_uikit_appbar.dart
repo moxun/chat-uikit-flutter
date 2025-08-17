@@ -236,9 +236,9 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
                               IconButton(
                                 padding: const EdgeInsets.only(left: 16),
                                 constraints: const BoxConstraints(),
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.arrow_back_ios,
-                                  color: hexToColor("010000"),
+                                  color: Colors.white,
                                   size: 17,
                                 ),
                                 onPressed: () async {
