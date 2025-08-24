@@ -22,7 +22,7 @@ class _QuickReplyListWidgetState extends TIMUIKitState<QuickReplyListWidget> {
       height: 290,
       child: ListView.builder(itemBuilder: (context, index) {
         return quickReplyItem(widget.quickReplyList[index]);
-      }),
+      } , itemCount: widget.quickReplyList.length,),
     );
   }
 
@@ -53,7 +53,7 @@ class _QuickReplyListWidgetState extends TIMUIKitState<QuickReplyListWidget> {
                 alignment: Alignment.center,
                 child: Text(
                   "发送",
-                  style: TextStyle(fontSize: 14, color: hexToColor("ffffff")),
+                  style: TextStyle(fontSize: 14, color: hexToColor("000000")),
                 ),
               ),
             )
