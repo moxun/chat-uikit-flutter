@@ -26,6 +26,8 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
 import 'package:tencent_keyboard_visibility/tencent_keyboard_visibility.dart';
 
+import '../quick_reply_list_widget.dart';
+
 GlobalKey<_TIMUIKitTextFieldLayoutNarrowState> narrowTextFieldKey = GlobalKey();
 
 class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
@@ -103,6 +105,7 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
 
   final List<CustomStickerPackage> stickerPackageList;
 
+  final List<String> quickReplyList;
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -137,7 +140,7 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       this.hintText,
       required this.customEmojiStickerList,
       this.controller,
-      required this.stickerPackageList})
+      required this.stickerPackageList , this.quickReplyList = const []})
       : super(key: key);
 
   @override
@@ -261,10 +264,18 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
     }
 
     if (showMore) {
-      return MorePanel(
-          morePanelConfig: widget.morePanelConfig,
-          conversationID: widget.conversationID,
-          conversationType: widget.conversationType);
+      // return MorePanel(
+      //     morePanelConfig: widget.morePanelConfig,
+      //     conversationID: widget.conversationID,
+      //     conversationType: widget.conversationType);
+      return QuickReplyListWidget(
+        quickReplyList: widget.quickReplyList,
+        onQuickReplyClick: (String quickReplyText) {
+          widget.textEditingController.text = quickReplyText;
+          widget.textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: quickReplyText.length));
+          widget.onSubmitted();
+        },
+      );
     }
 
     return const SizedBox(height: 0);
