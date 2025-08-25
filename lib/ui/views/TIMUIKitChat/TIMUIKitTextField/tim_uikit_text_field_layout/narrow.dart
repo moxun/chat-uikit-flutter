@@ -282,8 +282,11 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
   }
 
   double _getBottomHeight() {
+    final MediaQueryData mediaQuery = MediaQuery.of(context);
+    final double bottomSafeArea = mediaQuery.viewPadding.bottom;
+    
     if (showKeyboard) {
-      final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+      final currentKeyboardHeight = mediaQuery.viewInsets.bottom;
       double originHeight = settingModel.keyboardHeight;
       if (currentKeyboardHeight != 0) {
         if (currentKeyboardHeight >= originHeight) {
@@ -296,11 +299,11 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
       final height = originHeight != 0 ? originHeight : currentKeyboardHeight;
       return height;
     } else if (showMore || showEmojiPanel) {
-      return 248.0 + (bottomPadding ?? 0.0);
+      return 248.0 + bottomSafeArea;
     } else if (widget.textEditingController.text.length >= 46 && showKeyboard == false) {
-      return 25 + (bottomPadding ?? 0.0);
+      return 25 + bottomSafeArea;
     } else {
-      return bottomPadding ?? 0;
+      return bottomSafeArea;
     }
   }
 
