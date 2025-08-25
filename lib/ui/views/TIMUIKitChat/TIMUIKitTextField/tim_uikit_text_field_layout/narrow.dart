@@ -282,11 +282,8 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
   }
 
   double _getBottomHeight() {
-    final MediaQueryData mediaQuery = MediaQuery.of(context);
-    final double bottomSafeArea = mediaQuery.viewPadding.bottom;
-    
     if (showKeyboard) {
-      final currentKeyboardHeight = mediaQuery.viewInsets.bottom;
+      final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
       double originHeight = settingModel.keyboardHeight;
       if (currentKeyboardHeight != 0) {
         if (currentKeyboardHeight >= originHeight) {
@@ -299,11 +296,11 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
       final height = originHeight != 0 ? originHeight : currentKeyboardHeight;
       return height;
     } else if (showMore || showEmojiPanel) {
-      return 248.0 + bottomSafeArea;
+      return 248.0;
     } else if (widget.textEditingController.text.length >= 46 && showKeyboard == false) {
-      return 25 + bottomSafeArea;
+      return 25;
     } else {
-      return bottomSafeArea;
+      return 0;
     }
   }
 
@@ -627,14 +624,18 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                     ],
                   ),
                 ),
-                AnimatedContainer(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  duration: Duration(milliseconds: (showKeyboard && PlatformUtils().isAndroid) ? 200 : 340),
-                  curve: Curves.fastOutSlowIn,
-                  height: max(_getBottomHeight(), 0.0),
-                  child: ListView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [_getBottomContainer(theme)],
+                Container(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewPadding.bottom + 10
+                  ),
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: (showKeyboard && PlatformUtils().isAndroid) ? 200 : 340),
+                    curve: Curves.fastOutSlowIn,
+                    height: max(_getBottomHeight(), 0.0),
+                    child: ListView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [_getBottomContainer(theme)],
+                    ),
                   ),
                 ),
               ],
