@@ -625,10 +625,11 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewPadding.bottom + 30
+                  margin: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewPadding.bottom
                   ),
                   child: AnimatedContainer(
+                    padding: EdgeInsets.zero,
                     duration: Duration(milliseconds: (showKeyboard && PlatformUtils().isAndroid) ? 200 : 340),
                     curve: Curves.fastOutSlowIn,
                     height: max(_getBottomHeight(), 0.0),
