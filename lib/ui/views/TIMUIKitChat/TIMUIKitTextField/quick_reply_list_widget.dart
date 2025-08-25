@@ -18,8 +18,8 @@ class QuickReplyListWidget extends StatefulWidget {
 class _QuickReplyListWidgetState extends TIMUIKitState<QuickReplyListWidget> {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
-    return Container(
-      height: 290,
+    return SizedBox(
+      height: 248,
       child: ListView.builder(itemBuilder: (context, index) {
         return quickReplyItem(widget.quickReplyList[index]);
       } , itemCount: widget.quickReplyList.length,),
