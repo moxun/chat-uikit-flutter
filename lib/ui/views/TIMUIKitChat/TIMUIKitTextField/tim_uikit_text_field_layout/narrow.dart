@@ -634,6 +634,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                     curve: Curves.fastOutSlowIn,
                     height: max(_getBottomHeight(), 0.0),
                     child: ListView(
+                      padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [_getBottomContainer(theme)],
                     ),
