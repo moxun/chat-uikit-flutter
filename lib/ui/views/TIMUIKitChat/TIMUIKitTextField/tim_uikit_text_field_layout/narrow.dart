@@ -625,8 +625,8 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                   ),
                 ),
                 Container(
-                  margin: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewPadding.bottom
+                  margin: const EdgeInsets.only(
+                    bottom: 20.0,
                   ),
                   child: AnimatedContainer(
                     padding: EdgeInsets.zero,
