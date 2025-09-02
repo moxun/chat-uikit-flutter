@@ -106,6 +106,10 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
   final List<CustomStickerPackage> stickerPackageList;
 
   final List<String> quickReplyList;
+
+  /// Whether the input field can receive input content
+  final bool enableInput;
+
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -140,7 +144,7 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       this.hintText,
       required this.customEmojiStickerList,
       this.controller,
-      required this.stickerPackageList , this.quickReplyList = const []})
+      required this.stickerPackageList , this.quickReplyList = const [] , this.enableInput = true})
       : super(key: key);
 
   @override
@@ -483,6 +487,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                                 Center(
                                   child: KeyboardVisibility(
                                       child: ExtendedTextField(
+                                          enabled: widget.enableInput,
                                           maxLines: 4,
                                           minLines: 1,
                                           focusNode: widget.focusNode,

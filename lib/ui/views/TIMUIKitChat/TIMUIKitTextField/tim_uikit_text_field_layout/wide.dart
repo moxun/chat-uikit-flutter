@@ -161,6 +161,7 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
 
   final List<CustomStickerPackage> stickerPackageList;
 
+
   const TIMUIKitTextFieldLayoutWide(
       {Key? key,
       this.customStickerPanel,

@@ -178,6 +178,9 @@ class TIMUIKitChat extends StatefulWidget {
 
   final List<String> quickReplyList;
 
+  /// Whether the input field can receive input content
+  final bool enableInput;
+
   TIMUIKitChat({
     Key? key,
     this.groupID,
@@ -218,6 +221,7 @@ class TIMUIKitChat extends StatefulWidget {
     this.onSecondaryTapAvatar,
     this.customMessageHoverBarOnDesktop,
     this.quickReplyList = const [],
+    this.enableInput = true,
   }) : super(key: key) {
     startTime = DateTime.now().millisecondsSinceEpoch;
   }
@@ -568,6 +572,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                           showSendAudio: widget.config?.isAllowSoundMessage ?? true,
                                           showSendEmoji: widget.config?.isAllowEmojiPanel ?? true,
                                           quickReplyList: widget.quickReplyList,
+                                          enableInput: widget.enableInput,
                                         ));
                             },
                             selector: (c, model) {
