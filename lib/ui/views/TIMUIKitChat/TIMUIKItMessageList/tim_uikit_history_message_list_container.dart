@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_at_info.dart'
@@ -160,6 +161,12 @@ class _TIMUIKitHistoryMessageListContainerState extends TIMUIKitState<TIMUIKitHi
     return TIMUIKitHistoryMessageListSelector(
       conversationID: model.conversationID,
       builder: (context, messageList, child) {
+        final filteredMessageList = messageList.where((m) {
+          if (m == null) return true;
+          final isCustom = m.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM;
+          final data = m.customElem?.data ?? "";
+          return !(isCustom && data.contains("startTime"));
+        }).toList();
         return TIMUIKitHistoryMessageList(
           conversation: widget.conversation,
           model: model,
@@ -192,7 +199,7 @@ class _TIMUIKitHistoryMessageListContainerState extends TIMUIKitState<TIMUIKitHi
           },
           tongueItemBuilder: widget.tongueItemBuilder,
           initFindingMsg: widget.initFindingMsg,
-          messageList: messageList,
+          messageList: filteredMessageList,
           onLoadMore: (String? a, LoadDirection direction, [int? b, int? lastSeq]) async {
             return await requestForData(a, direction, model, b, lastSeq);
           },
