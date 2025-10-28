@@ -563,6 +563,27 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     if (newMsg == null) {
       return;
     }
+    
+    // 拦截含 startTime 的自定义消息，直接丢弃
+    final bool isCustom = newMsg.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM;
+    bool hasStartTime = false;
+    if (isCustom) {
+      final String data = newMsg.customElem?.data ?? "";
+      try {
+        final decoded = jsonDecode(data);
+        if (decoded is Map && decoded.containsKey('startTime')) {
+          hasStartTime = true;
+        }
+      } catch (_) {
+        // data 非 JSON 时，回退到字符串匹配
+        hasStartTime = data.contains('startTime');
+      }
+    }
+    if (isCustom && hasStartTime) {
+      // 直接返回，不加入消息列表
+      return;
+    }
+    
     // check the message is editing status msg. and flutter is only support the latest version
     bool isEditMessage = _editStatusCheck(msgComing);
 
