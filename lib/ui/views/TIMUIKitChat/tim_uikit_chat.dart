@@ -574,6 +574,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                           showSendAudio: widget.config?.isAllowSoundMessage ?? true,
                                           showSendEmoji: widget.config?.isAllowEmojiPanel ?? true,
                                           quickReplyList: widget.quickReplyList,
+                                          showImage: widget.showImage,
                                           enableInput: widget.enableInput,
                                         ));
                             },
