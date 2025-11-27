@@ -1,15 +1,22 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
@@ -18,6 +25,7 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
@@ -25,6 +33,7 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/emoji_text.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
 import 'package:tencent_keyboard_visibility/tencent_keyboard_visibility.dart';
+import '../tim_uikit_more_panel.dart';
 
 import '../quick_reply_list_widget.dart';
 
@@ -110,6 +119,8 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
   /// Whether the input field can receive input content
   final bool enableInput;
 
+  final bool showImage;
+
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -144,6 +155,7 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       this.hintText,
       required this.customEmojiStickerList,
       this.controller,
+      this.showImage = true,
       required this.stickerPackageList , this.quickReplyList = const [] , this.enableInput = true})
       : super(key: key);
 
@@ -153,6 +165,10 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
 
 class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFieldLayoutNarrow> {
   final TUISettingModel settingModel = serviceLocator<TUISettingModel>();
+  final ImagePicker _picker = ImagePicker();
+  final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  String? fileName;
+  File? tempFile;
 
   bool showMore = false;
   bool showMoreButton = true;
@@ -588,6 +604,22 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                                   width: 28,
                                 ),
                         ),
+                      if(widget.showImage)
+                        InkWell(
+                          onTap: () {
+                            _sendImageMessage(widget.model, theme);
+                            widget.goDownBottom();
+                          },
+                          child: PlatformUtils().isWeb
+                              ? Icon(Icons.add_circle_outline_outlined, color: hexToColor("5c6168"), size: 32)
+                              : SvgPicture.asset(
+                            'images/add_image.svg',
+                            package: 'tencent_cloud_chat_uikit',
+                            color: const Color.fromRGBO(68, 68, 68, 1),
+                            height: 28,
+                            width: 28,
+                          ),
+                        ),
                       const SizedBox(
                         width: 10,
                       ),
@@ -651,5 +683,95 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
         ],
       ),
     );
+  }
+}
+
+extension _NarrowImageSend on _TIMUIKitTextFieldLayoutNarrowState {
+  Future<void> _sendImageMessage(TUIChatSeparateViewModel model, TUITheme theme) async {
+    try {
+      final convID = widget.conversationID;
+      final convType = widget.conversationType;
+      if (PlatformUtils().isMobile) {
+        if (PlatformUtils().isAndroid) {
+          AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+          if ((androidInfo.version.sdkInt) >= 33) {
+            final videos = await Permissions.checkPermission(
+              context,
+              Permission.videos.value,
+              theme,
+            );
+            final photos = await Permissions.checkPermission(
+              context,
+              Permission.photos.value,
+              theme,
+            );
+            if (!videos && !photos) {
+              return;
+            }
+          } else {
+            final storage = await Permissions.checkPermission(
+              context,
+              Permission.storage.value,
+              theme,
+            );
+            if (!storage) {
+              return;
+            }
+          }
+        } else {
+          final photos = await Permissions.checkPermission(
+            context,
+            Permission.photos.value,
+            theme,
+          );
+          if (!photos) {
+            return;
+          }
+        }
+
+        final pickedAssets = await AssetPicker.pickAssets(context);
+        if (pickedAssets != null) {
+          for (var asset in pickedAssets) {
+            if (asset.type == AssetType.image) {
+              final originFile = await asset.originFile;
+              final filePath = originFile?.path;
+              final size = await originFile!.length();
+              if (filePath != null) {
+                if (size >= MorePanelConfig.IMAGE_MAX_SIZE) {
+                  onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("文件大小超出了限制")));
+                  return;
+                }
+                MessageUtils.handleMessageError(
+                  model.sendImageMessage(imagePath: filePath, convID: convID, convType: convType),
+                  context,
+                );
+              }
+            }
+          }
+        }
+      } else if (PlatformUtils().isWeb) {
+        final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+        if (pickedFile != null) {
+          fileName = pickedFile.name;
+          tempFile = File(pickedFile.path);
+          html.Node? inputElem = html.document.getElementById("__image_picker_web-file-input")?.querySelector("input");
+          MessageUtils.handleMessageError(
+            model.sendImageMessage(inputElement: inputElem, imagePath: tempFile?.path, convID: convID, convType: convType),
+            context,
+          );
+        }
+      } else {
+        FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.image);
+        if (result != null && result.files.isNotEmpty) {
+          final savePath = result.files.single.path!;
+          MessageUtils.handleMessageError(
+            model.sendImageMessage(imagePath: savePath, convID: convID, convType: convType),
+            context,
+          );
+        }
+      }
+    } catch (err) {
+      outputLogger.i("err: $err");
+    }
   }
 }

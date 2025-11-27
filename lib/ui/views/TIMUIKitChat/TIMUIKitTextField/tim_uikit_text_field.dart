@@ -111,6 +111,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
   /// Whether the input field can receive input content
   final bool enableInput;
+
+  final bool showImage;
   const TIMUIKitInputTextField({
     Key? key,
     required this.conversationID,
@@ -136,6 +138,7 @@ class TIMUIKitInputTextField extends StatefulWidget {
     this.chatConfig,
     this.quickReplyList = const [],
     this.enableInput = true,
+    this.showImage = false,
   }) : super(key: key);
 
   @override
@@ -1088,6 +1091,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     showSendEmoji: widget.showSendEmoji,
                     showMorePanel: widget.showMorePanel,
                     quickReplyList: widget.quickReplyList,
+                    showImage : widget.showImage,
                     customEmojiStickerList: widget.customEmojiStickerList,
                     enableInput: widget.enableInput),
                 desktopWidget: TIMUIKitTextFieldLayoutWide(

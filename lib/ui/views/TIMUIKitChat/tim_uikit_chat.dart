@@ -181,6 +181,7 @@ class TIMUIKitChat extends StatefulWidget {
   /// Whether the input field can receive input content
   final bool enableInput;
 
+  final bool showImage;
   TIMUIKitChat({
     Key? key,
     this.groupID,
@@ -222,6 +223,7 @@ class TIMUIKitChat extends StatefulWidget {
     this.customMessageHoverBarOnDesktop,
     this.quickReplyList = const [],
     this.enableInput = true,
+    this.showImage = false,
   }) : super(key: key) {
     startTime = DateTime.now().millisecondsSinceEpoch;
   }
