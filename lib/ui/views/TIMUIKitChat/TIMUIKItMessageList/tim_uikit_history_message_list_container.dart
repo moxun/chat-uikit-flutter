@@ -165,7 +165,7 @@ class _TIMUIKitHistoryMessageListContainerState extends TIMUIKitState<TIMUIKitHi
           if (m == null) return true;
           final isCustom = m.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM;
           final data = m.customElem?.data ?? "";
-          return !(isCustom && data.contains("startTime"));
+          return !(isCustom && (data.contains("startTime") || data.contains("newRemainSecs")) );
         }).toList();
         return TIMUIKitHistoryMessageList(
           conversation: widget.conversation,

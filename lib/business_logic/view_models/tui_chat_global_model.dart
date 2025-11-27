@@ -571,12 +571,12 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
       final String data = newMsg.customElem?.data ?? "";
       try {
         final decoded = jsonDecode(data);
-        if (decoded is Map && decoded.containsKey('startTime')) {
+        if (decoded is Map && decoded.containsKey('startTime') &&  decoded.containsKey('newRemainSecs')) {
           hasStartTime = true;
         }
       } catch (_) {
         // data 非 JSON 时，回退到字符串匹配
-        hasStartTime = data.contains('startTime');
+        hasStartTime = data.contains('startTime') || data.contains('newRemainSecs');
       }
     }
     if (isCustom && hasStartTime) {
